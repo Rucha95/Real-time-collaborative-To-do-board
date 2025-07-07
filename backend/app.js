@@ -1,6 +1,7 @@
 import express from 'express'; //ES6 modules
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import authRoutes from './src/routes/auth.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.get('/',(req,res)=>{
     res.send("Hello");
 })
 
+
 mongoose.connect(process.env.MONGO_URI)
 .then(()=>{
     console.log("connected to mongodb..");
@@ -23,6 +25,8 @@ mongoose.connect(process.env.MONGO_URI)
 .catch((err)=>{
     console.error("mongodb connection error",err.message);
 });
+
+app.use('/api/auth', authRoutes);
 
 
 
