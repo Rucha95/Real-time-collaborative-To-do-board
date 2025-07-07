@@ -1,12 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Signup from './pages/signup';
+import Login from './pages/login';
+import Dashboard from './pages/dashboard';
+import { AuthContext } from './context/authContext';
 
-function App() {
+export default function App() {
+  const { token } = useContext(AuthContext);
+
   return (
-    <div className="App">
-      <h1>Real-time To-Do Board</h1>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to={token ? "/dashboard" : "/signup"} />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard/>} />
+        {/* <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        /> */}
+        {/* <Route path="*" element={<h2>404 - Page Not Found</h2>} /> */}
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
