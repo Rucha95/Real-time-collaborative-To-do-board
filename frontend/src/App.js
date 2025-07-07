@@ -4,6 +4,7 @@ import Signup from './pages/signup';
 import Login from './pages/login';
 import Dashboard from './pages/dashboard';
 import { AuthContext } from './context/authContext';
+import PrivateRoute from './components/privateRoute';
 
 export default function App() {
   const { token } = useContext(AuthContext);
@@ -14,7 +15,7 @@ export default function App() {
         <Route path="/" element={<Navigate to={token ? "/dashboard" : "/signup"} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard/>} />
+        <Route path="/dashboard" element={ <Dashboard />}/>
         {/* <Route
           path="/dashboard"
           element={
