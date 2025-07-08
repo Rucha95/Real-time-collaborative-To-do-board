@@ -23,7 +23,7 @@ export default function Signup () {
     e.preventDefault();
     setMsg('');
     try {
-      const res = await api.post('/api/auth/signup', form);
+      const res = await api.post('/v1/api/auth/signup', form);
       const { token, user } = res.data;
       login(token, user); 
       navigate('/dashboard');

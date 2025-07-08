@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './src/routes/auth.js';
 import cors from 'cors';
+import taskRoutes from './src/routes/taskRoutes.js';
+import Task from './src/models/Task.js';
 
 dotenv.config();
 
@@ -15,14 +17,10 @@ app.use(cors({
   }));
 app.use(express.json());
 
-app.get('/',(req,res)=>{
-    res.send("Hello");
-})
-
-
 mongoose.connect(process.env.MONGO_URI)
 .then(()=>{
     console.log("connected to mongodb..");
+
     app.listen(PORT,()=>{
         console.log(`server is running on http://localhost:${PORT}`);
     });
@@ -31,7 +29,9 @@ mongoose.connect(process.env.MONGO_URI)
     console.error("mongodb connection error",err.message);
 });
 
-app.use('/api/auth', authRoutes);
+
+app.use('/v1/api/auth', authRoutes);
+app.use('/v1/api/tasks', taskRoutes);
 
 
 
