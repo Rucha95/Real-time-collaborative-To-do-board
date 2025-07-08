@@ -5,6 +5,7 @@ import Login from './pages/login';
 import Dashboard from './pages/dashboard';
 import { AuthContext } from './context/authContext';
 import PrivateRoute from './components/privateRoute';
+import CreateTaskForm from './pages/createTaskForm';
 
 export default function App() {
   const { token } = useContext(AuthContext);
@@ -23,6 +24,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/create-task" element={<CreateTaskForm />}/>
         {/* <Route path="*" element={<h2>404 - Page Not Found</h2>} /> */}
       </Routes>
     </Router>

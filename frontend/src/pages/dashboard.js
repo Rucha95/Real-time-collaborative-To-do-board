@@ -7,6 +7,9 @@ import {
     Droppable,
     Draggable
   } from '@hello-pangea/dnd'; 
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:3001');
 
 export default function Dashboard() {
   const { user,token, logout } = useContext(AuthContext);
@@ -38,6 +41,12 @@ export default function Dashboard() {
     };
 
     fetchTasks();
+    socket.on('taskCreated', (newTask) => {
+        setTasks((prevTasks) => [...prevTasks, newTask]);
+      });
+    return () => {
+        socket.off('taskCreated');
+      };
   }, [token]);
 
   const handleLogout = () => {
@@ -74,7 +83,21 @@ return(
       <p>Email: {user?.email}</p>
       <button onClick={handleLogout}>Logout</button>
 
-      <h2>Project Tasks</h2>
+      <h2>Project Tasks</h2> 
+      <button
+  onClick={() => navigate('/create-task')}
+  style={{
+    padding: '8px 16px',
+    backgroundColor: '#1976d2',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    marginBottom: '16px',
+    cursor: 'pointer'
+  }}
+>
+  + Create Task
+</button>
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>

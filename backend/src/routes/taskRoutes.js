@@ -23,6 +23,9 @@ router.post('/:userId', authenticateUser, async (req, res) => {
       createdBy: userId
     });
 
+    const io = req.io;
+    io.emit('taskCreated', task); 
+    
     await task.save();
     res.status(201).json({ msg: 'Task created', task });
   } catch (err) {
