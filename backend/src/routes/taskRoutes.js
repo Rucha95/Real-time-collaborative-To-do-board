@@ -34,4 +34,18 @@ router.post('/:userId', authenticateUser, async (req, res) => {
   }
 });
 
+router.get('/getAlltasks', authenticateUser, async (req, res) => {
+    try {
+      const tasks = await Task.find()
+        .populate('assignedTo', 'name email')   
+        .populate('createdBy', 'name email')    
+        .sort({ createdAt: -1 });              
+  
+      res.status(200).json({ tasks });
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+      res.status(500).json({ msg: 'Server error' });
+    }
+  });
+
 export default router;

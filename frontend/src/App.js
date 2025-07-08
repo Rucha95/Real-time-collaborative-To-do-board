@@ -15,15 +15,14 @@ export default function App() {
         <Route path="/" element={<Navigate to={token ? "/dashboard" : "/signup"} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={ <Dashboard />}/>
-        {/* <Route
+        <Route
           path="/dashboard"
           element={
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
           }
-        /> */}
+        />
         {/* <Route path="*" element={<h2>404 - Page Not Found</h2>} /> */}
       </Routes>
     </Router>
