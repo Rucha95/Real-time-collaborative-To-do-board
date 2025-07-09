@@ -83,7 +83,7 @@ router.get('/changelogs',authenticateUser, async (req, res) => {
         const changeLogs = await ChangeLog.find()
             .sort({ timestamp: -1 }) 
             .limit(20) 
-            .populate('userId', 'username') 
+            .populate('userId', 'name') 
             .populate('taskId', 'title') 
             .lean(); 
 
