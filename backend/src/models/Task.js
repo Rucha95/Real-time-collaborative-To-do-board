@@ -15,7 +15,10 @@ const taskSchema = new mongoose.Schema({
   },
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  version: { type: Number, default: 1 }
+  //lastModifiedAt: { type: Date, default: Date.now },
+
 });
 
 export default mongoose.model('Task', taskSchema);

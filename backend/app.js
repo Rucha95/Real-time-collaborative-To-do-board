@@ -8,6 +8,9 @@ import Task from './src/models/Task.js';
 import http from 'http';
 import { Server } from 'socket.io';
 import userRoutes from './src/routes/userRoutes.js';
+import ChangeLog from './src/models/ChangeLog.js';
+import User from './src/models/User.js';
+
 
 dotenv.config();
 
@@ -39,6 +42,21 @@ mongoose.connect(process.env.MONGO_URI)
 .catch((err)=>{
     console.error("mongodb connection error",err.message);
 });
+
+// const DB_URI = process.env.MONGO_URI;
+// const connectAndSyncIndexes = async () => {
+//     try{
+//         await mongoose.connect(DB_URI);
+//     console.log('MongoDB connected');
+
+//     await User.syncIndexes(); 
+//     console.log('Indexes synced');
+//     }
+//     catch (err) {
+//         console.error('Error syncing indexes:', err);
+//       }
+// }
+// connectAndSyncIndexes();
 
 
 app.use('/v1/api/auth', authRoutes);
