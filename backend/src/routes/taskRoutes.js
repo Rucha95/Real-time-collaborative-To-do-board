@@ -6,7 +6,7 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-const logChange = async (taskId, userId, action, fieldChanged = null, oldValue = null, newValue = null, details = null) => {
+const logChange = async (taskId, userId, action, fieldChanged = null, oldValue = null, newValue = null, details = null,io=null) => {
     try {
         const log = new ChangeLog({
             taskId,
@@ -17,7 +17,16 @@ const logChange = async (taskId, userId, action, fieldChanged = null, oldValue =
             newValue,
             details,
         });
-        await log.save();
+    const savedLog = await log.save();
+    const populatedLog = await savedLog.populate([
+        { path: 'taskId', select: 'title' },
+        { path: 'userId', select: 'name' },
+      ]);
+      if(io){
+        io.emit('changelogs', populatedLog);
+        console.log("changelogs"+populatedLog);
+    }
+    
         console.log(`Change logged: Task ${taskId}, Action: ${action}, By User: ${userId}`);
     } catch (error) {
         console.error('Error logging change:', error);
@@ -45,7 +54,6 @@ router.post('/:userId', authenticateUser, async (req, res) => {
     });
 
     const io = req.io;
-    io.emit('taskCreated', task); 
 
     await task.save();
     
@@ -93,5 +101,45 @@ router.get('/changelogs',authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch recent change logs', error: error.message });
     }
 });
+
+router.patch('/:taskId/status', authenticateUser, async (req, res) => {
+    const { taskId } = req.params;
+    const { newStatus } = req.body;
+    const userId = req.user.userId;
+  
+    try {
+      const task = await Task.findById(taskId);
+      console.log("task Id is:"+task);
+      if (!task) return res.status(404).json({ message: 'Task not found' });
+  
+      const oldStatus = task.status;
+      if (oldStatus === newStatus) {
+        return res.status(200).json({ message: 'Status unchanged' });
+      }
+  
+      task.status = newStatus;
+      await task.save();
+      const io = req.io;
+      
+
+    //console.log(`Change logged & emitted: Task ${taskId}, Action: ${action}`);
+    await logChange(
+        task._id,
+        userId,
+        'status_changed',
+        'status',
+        oldStatus,
+        newStatus,
+        `Status changed from ${oldStatus} to ${newStatus}`,
+        io
+        );
+  
+  
+      res.status(200).json({ message: 'Status updated', task });
+    } catch (err) {
+      console.error('Error updating task status:', err);
+      res.status(500).json({ message: 'Failed to update status' });
+    }
+  });
 
 export default router;

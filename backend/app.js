@@ -1,4 +1,4 @@
-import express from 'express'; //ES6 modules
+import express from 'express'; 
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './src/routes/auth.js';
@@ -20,12 +20,26 @@ const PORT = process.env.port || 3001;
 const io = new Server(server, {
     cors: {
       origin: 'http://localhost:3000',
-      methods: ['GET', 'POST', 'PUT', 'DELETE']
+      credentials:true
     }
   });
 
-app.use(cors());
+
+app.set('io', io);
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+  }));
 app.use(express.json());
+
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
+    });
+  });
+
 app.use((req, res, next) => {
     req.io = io;
     next();
@@ -42,22 +56,6 @@ mongoose.connect(process.env.MONGO_URI)
 .catch((err)=>{
     console.error("mongodb connection error",err.message);
 });
-
-// const DB_URI = process.env.MONGO_URI;
-// const connectAndSyncIndexes = async () => {
-//     try{
-//         await mongoose.connect(DB_URI);
-//     console.log('MongoDB connected');
-
-//     await User.syncIndexes(); 
-//     console.log('Indexes synced');
-//     }
-//     catch (err) {
-//         console.error('Error syncing indexes:', err);
-//       }
-// }
-// connectAndSyncIndexes();
-
 
 app.use('/v1/api/auth', authRoutes);
 app.use('/v1/api/tasks', taskRoutes);

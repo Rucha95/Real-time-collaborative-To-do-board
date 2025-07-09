@@ -7,18 +7,18 @@ import {
     Droppable,
     Draggable
   } from '@hello-pangea/dnd'; 
-import io from 'socket.io-client';
+import socket from '../utils/socket.js';
 
-const socket = io('http://localhost:3001');
 
 export default function Dashboard() {
   const { user,token, logout } = useContext(AuthContext);
   const [tasks,setTasks] = useState([]);
+  const [changelogs, setChangelogs] = useState([]);
   const navigate = useNavigate(); 
 
   useEffect(() => {
     if (!token) return;
-
+    
     const fetchTasks = async () => {
       try {
         const res = await fetch('http://localhost:3001/v1/api/tasks/getAlltasks', {
@@ -40,14 +40,44 @@ export default function Dashboard() {
       }
     };
 
+    const fetchChangelogs = async () => {
+        try {
+          const res = await fetch('http://localhost:3001/v1/api/tasks/changelogs', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+  
+          if (!res.ok) throw new Error('Failed to fetch changelogs');
+          const data = await res.json();
+          setChangelogs(data);
+        } catch (err) {
+          console.error('Error fetching changelogs:', err);
+        }
+      };
+
     fetchTasks();
-    socket.on('taskCreated', (newTask) => {
-        setTasks((prevTasks) => [...prevTasks, newTask]);
-      });
+    fetchChangelogs();
+
+    const handleChangedLogs = (newLog) => {
+        console.log('New log received via socket:', newLog);
+        setChangelogs(prevLogs => [newLog, ...prevLogs.slice(0, 19)]);
+    };
+    socket.on('changelogs', handleChangedLogs);
+
+    // socket.on('connect', () => {
+    //     console.log('Connected to socket:', socket.id);
+    //   });
+
     return () => {
-        socket.off('taskCreated');
+        socket.off('changelogs', handleChangedLogs);
       };
   }, [token]);
+
+  useEffect(() => {
+    console.log("changelogs updated:", changelogs);
+  }, [changelogs]);
 
   const handleLogout = () => {
     logout();             
@@ -75,29 +105,116 @@ export default function Dashboard() {
     setTasks(updatedTasks);
 
     //update status api call
+    try {
+        const res = await fetch(`http://localhost:3001/v1/api/tasks/${draggableId}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ newStatus })
+        });
+    
+        if (!res.ok) {
+          throw new Error('Failed to update status');
+        }
+
+      } catch (err) {
+        console.error('Error updating status:', err);
+      }
 
 };
 return(
-    <div>
-      <h1>Welcome {user?.name}</h1>
-      <p>Email: {user?.email}</p>
-      <button onClick={handleLogout}>Logout</button>
-
-      <h2>Project Tasks</h2> 
-      <button
-  onClick={() => navigate('/create-task')}
-  style={{
-    padding: '8px 16px',
-    backgroundColor: '#1976d2',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    marginBottom: '16px',
-    cursor: 'pointer'
-  }}
->
-  + Create Task
-</button>
+    <>
+    
+    <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '16px 24px',
+        backgroundColor: '#4120a9',
+        color: 'white',
+        borderBottom: '1px solid #ccc'
+      }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: '22px' }}>Welcome, {user?.name}</h1>
+          <p style={{ margin: 0, fontSize: '14px' }}>Email: {user?.email}</p>
+        </div>
+        <div style={{
+    position: 'absolute',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    textAlign: 'center',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#fff'
+  }}>
+    Project: Real-Time To-Do Collaborative Board
+  </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            onClick={() => navigate('/create-task')}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#43a047',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            + Create Task
+          </button>
+      
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#e53935',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    <div style={{ display: 'flex' }}>
+        
+        <div style={{
+        width: '300px',
+        borderRight: '1px solid #ccc',
+        padding: '16px',
+        backgroundColor: '#f5f5f5',
+        height: '100vh',
+        overflowY: 'auto'
+      }}>
+        <h3 style={{ textAlign: 'center' }}>Recent Changes</h3>
+        <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#FADADD' }}>
+              <th style={cellStyle}>Task</th>
+              <th style={cellStyle}>User</th>
+              <th style={cellStyle}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {changelogs.map((log, idx) => (
+              <tr key={idx}>
+                <td style={cellStyle}>{log.taskId?.title || 'N/A'}</td>
+                <td style={cellStyle}>{log.userId?.name || 'N/A'}</td>
+                <td style={cellStyle}>{log.action}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    <div style={{ flex: 1, padding: '24px' }}>
+      
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
@@ -150,6 +267,8 @@ return(
         </div>
       </DragDropContext>
     </div>
+    </div>
+    </>
 );
 }
 const getHeaderColor = (status) => {
@@ -176,4 +295,9 @@ const getHeaderColor = (status) => {
       default:
         return '#333';
     }
+  };
+  const cellStyle = {
+    border: '1px solid #ccc',
+    padding: '6px',
+    textAlign: 'left'
   };
