@@ -28,7 +28,7 @@ const io = new Server(server, {
 app.set('io', io);
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000','https://real-time-collaborative-to-do-board-c0hlqyy0e-ruchs-projects.vercel.app'],
     credentials: true
   }));
 app.use(express.json());

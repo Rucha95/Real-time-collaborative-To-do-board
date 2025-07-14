@@ -1,0 +1,96 @@
+.task-form-card {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 24px;
+    border-radius: 16px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .task-form-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    z-index: -1;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #4120a9, #6741d9, #8a63f0);
+    background-size: 300% 300%;
+    animation: gradientBorder 8s ease infinite;
+  }
+  
+  @keyframes gradientBorder {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  .form-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+  }
+  
+  .task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .form-input,
+  .form-select {
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 1px solid #cfc3f5;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .form-input:focus,
+  .form-select:focus {
+    border-color: #4120a9;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(65, 32, 169, 0.2);
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .form-row .form-select {
+    flex: 1;
+  }
+  
+  .form-button {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: #4120a9;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  
+  .form-button:hover {
+    background-color: #321890;
+    box-shadow: 0 4px 12px rgba(65, 32, 169, 0.3);
+  }
+  

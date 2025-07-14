@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/authContext';
+import './createTaskForm.css';
 
 export default function CreateTaskForm() {
   const { token, user } = useContext(AuthContext);
@@ -39,9 +40,11 @@ export default function CreateTaskForm() {
         description,
         priority,
         status,
-        assignedTo
+        assignedTo:assignedTo === '' ? null :assignedTo,
       })
     });
+    const data = await res.json();
+    console.log('AssignedTo received in response:', data.task?.assignedTo);
 
     if (res.ok) {
       navigate('/dashboard');
@@ -52,34 +55,61 @@ export default function CreateTaskForm() {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-      <h2>Create Task</h2>
-      <form onSubmit={handleSubmit}>
+   <>
+ 
+    <div className="task-form-card">
+      
+       <h2 className="form-title">Create Task</h2> 
+      <form onSubmit={handleSubmit} className="task-form">
         <input
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+          className="form-input"
         />
+  
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+          className="form-input"
+          rows="3"
         />
-        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
-        </select>
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option>Todo</option>
-          <option>In Progress</option>
-          <option>Done</option>
-        </select>
-        <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
+  
+        <div className="form-row">
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="form-select"
+          >
+            <option disabled>Priority</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+  
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="form-select"
+          >
+            <option disabled>Status</option>
+            <option>Todo</option>
+            <option>In Progress</option>
+            <option>Done</option>
+          </select>
+        </div>
+  
+        <select
+          value={assignedTo || ''}
+          onChange={(e) => {
+            const val = e.target.value;
+            setAssignedTo(val === '' ? null : val);
+          }}
+          className="form-select"
+        >
           <option value="">Assign to...</option>
           {users.map((u) => (
             <option key={u._id} value={u._id}>
@@ -87,11 +117,14 @@ export default function CreateTaskForm() {
             </option>
           ))}
         </select>
-        <br />
-        <button type="submit" style={{ marginTop: '12px' }}>
+  
+        <button type="submit" className="form-button">
           Create Task
         </button>
       </form>
     </div>
+    </>
   );
+  
+  
 }

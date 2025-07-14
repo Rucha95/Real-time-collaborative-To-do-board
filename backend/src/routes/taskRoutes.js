@@ -42,6 +42,7 @@ router.post('/:userId', authenticateUser, async (req, res) => {
 
   try {
     const { title, description, assignedTo, status, priority } = req.body;
+    console.log("check assigned To" , req.body.assignedTo);
 
     const task = new Task({
       title,

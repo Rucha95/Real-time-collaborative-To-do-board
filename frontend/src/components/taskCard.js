@@ -41,9 +41,27 @@ const TaskCard = ({ task, status }) => {
 
       <h4 style={{ margin: '4px 0' }}>{task.title}</h4>
       <p style={{ fontSize: '13px', margin: '2px 0' }}>Details:{task.description}</p>
-      <p style={{ fontSize: '13px', margin: '2px 0' }}>
-        Assigned To: <strong>{task.assignedTo?.name || 'Unassigned'}</strong>
-      </p>
+      {task.assignedTo != null ? (
+  <p style={{ fontSize: '13px', margin: '2px 0' }}>
+    Assigned To: <strong>{task.assignedTo.name}</strong>
+  </p>
+) : (
+  <button
+    style={{
+      marginTop: '10px',
+      backgroundColor: '#6741d9',
+      color: '#fff',
+      padding: '8px 12px',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontSize: '14px',
+    }}
+    // onClick={() => handleAssign(task._id)}
+  >
+    Smart Assign
+  </button>
+)}
       <p style={{ fontSize: '11px', color: '#777' }}>
         Created At: {new Date(task.createdAt).toLocaleString()}
       </p>
